@@ -177,13 +177,15 @@ class Sensor:
         if not self._ser:
             return None
 
+        # urSense takes `e` to trigger newest reading
+        self._ser.write(b'e')
         while self._ser.in_waiting:
             data = self._ser.readline()
 
         if not data:
             return None
 
-        sensor_log = parse_ursense(str(data))
+        sensor_log = parse_ursense(data.decode('utf-8'))
         if sensor_log == None:
             return None
 
