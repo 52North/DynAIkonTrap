@@ -17,7 +17,7 @@ from time import sleep
 from unittest import TestCase
 from collections import OrderedDict
 
-from DynAIkonTrap.sensor import SensorLogs, SensorLog
+from DynAIkonTrap.sensor import Reading, SensorLogs, SensorLog, parse_ursense
 from DynAIkonTrap.settings import SensorSettings
 
 
@@ -148,3 +148,73 @@ class LookupAndDeleteTestCase(TestCase):
         self._sl._lookup(5.1)
         self.assertEqual(len(self._sl._storage), 1)
         self.assertEqual(self._sl._storage, OrderedDict({5: SensorLog(5, 6, 7, 8, 9)}))
+
+
+class ParseEnvmReportTypeTestCase(TestCase):
+    def test_parse_envm_report_type(self):
+        ret = parse_ursense(
+            'selE envm 2.800 s usid 0123456789ab skwt 24.6 C brig 1.86% airr 4.69 kOhm humi 35.2% atpr 1002.8 mbar prst 25.3 C'
+        )
+        self.assertTrue(isinstance(ret.system_time, float))
+        self.assertEqual(
+            ret,
+            SensorLog(
+                system_time=ret.system_time,
+                ursense_id='0123456789ab',
+                brightness=Reading(1.86, '%'),
+                humidity=Reading(35.2, '%'),
+                pressure=Reading(1002.8, 'mbar'),
+                temperature_skwt=Reading(24.6, 'C'),
+                temperature_prst=Reading(25.3, 'C'),
+                air_quality=Reading(4.69, 'kOhm'),
+                gps_time=None,
+                gps_location=None,
+                altitude=None,
+                sun_azimuth=None,
+                sun_altitude=None,
+            ),
+        )
+
+
+class ParseEnvtReportTypeTestCase(TestCase):
+    def test_parse_envt_report_type(self):
+        self.assertRaises(
+            NotImplementedError,
+            parse_ursense,
+            'selE envt 2.800 s usid 0123456789ab skwt 24.6 C brig 1.86% airr 4.69 kOhm humi 35.2% atpr 1002.8 mbar prst 25.3 C',
+        )
+
+
+class ParseEnvlReportTypeTestCase(TestCase):
+    def test_parse_envl_report_type(self):
+        self.assertRaises(
+            NotImplementedError,
+            parse_ursense,
+            'selE envl 2.800 s usid 0123456789ab skwt 24.6 C brig 1.86% airr 4.69 kOhm humi 35.2% atpr 1002.8 mbar prst 25.3 C',
+        )
+
+
+class ParseEnvsReportTypeTestCase(TestCase):
+    def test_parse_envs_report_type(self):
+        ret = parse_ursense(
+            'selE envs 114.205 s usid 0123456789ab skwt 25.2 C brig 1.27% airr 5.47 kOhm humi 35.1% atpr 1003 mbar prst 25.7 C Fri 30.04.2021 20;25;20.123 E1+0000 50.36194N 4.74472W alti 108 m sazi 116.123 WNW salt -1.123 deg'
+        )
+        self.assertTrue(isinstance(ret.system_time, float))
+        self.assertEqual(
+            ret,
+            SensorLog(
+                system_time=ret.system_time,
+                ursense_id='0123456789ab',
+                brightness=Reading(1.27, '%'),
+                humidity=Reading(35.1, '%'),
+                pressure=Reading(1003, 'mbar'),
+                temperature_skwt=Reading(25.2, 'C'),
+                temperature_prst=Reading(25.7, 'C'),
+                air_quality=Reading(5.47, 'kOhm'),
+                gps_time='Fri 30.04.2021 20;25;20.123 E1+0000',
+                gps_location='50.36194N 4.74472W',
+                altitude=Reading(108, 'm'),
+                sun_azimuth=Reading(116.123, 'deg'),
+                sun_altitude=Reading(-1.123, 'deg'),
+            ),
+        )
