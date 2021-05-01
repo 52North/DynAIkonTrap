@@ -48,7 +48,7 @@ from numpy import asarray
 import cv2  # pdoc3 can't handle importing individual OpenCV functions
 
 from DynAIkonTrap.filtering import Filter
-from DynAIkonTrap.sensor import SensorLogs, Reading
+from DynAIkonTrap.sensor import SensorLog, SensorLogs, Reading
 from DynAIkonTrap.logging import get_logger
 from DynAIkonTrap.settings import (
     SenderSettings,
@@ -114,7 +114,7 @@ class VideoCaption:
         vtt += '\n'
 
         for key, caption in sorted(captions.items()):
-            log = caption['log']
+            log: SensorLog = caption['log']
             if log is None:
                 continue
 
@@ -125,12 +125,12 @@ class VideoCaption:
                 self._video_time_to_str(start_time),
                 self._video_time_to_str(stop_time),
                 '{:%H:%M:%S}'.format(
-                    datetime.fromtimestamp(log.timestamp, timezone.utc)
+                    datetime.fromtimestamp(log.system_time, timezone.utc)
                 ),
             )
 
             vtt += 'T: {} - RH: {} - L: {} - P: {}\n\n'.format(
-                self._reading_to_str(log.temperature),
+                self._reading_to_str(log.temperature_skwt),
                 self._reading_to_str(log.humidity),
                 self._reading_to_str(log.brightness),
                 self._reading_to_str(log.pressure),
