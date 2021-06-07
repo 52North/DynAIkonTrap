@@ -70,8 +70,8 @@ def parse_ursense(data: str) -> Union[SensorLog, Type[None]]:
 
     system_time = time()
 
-    fields = data.split(' ')
-    if fields[0] != 'selE':
+    fields = data.strip().split(' ')
+    if not fields[0].startswith('sel'):
         # This happens on start-up
         return None
 

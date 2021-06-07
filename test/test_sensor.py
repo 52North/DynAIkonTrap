@@ -150,10 +150,18 @@ class LookupAndDeleteTestCase(TestCase):
         self.assertEqual(self._sl._storage, OrderedDict({5: SensorLog(5, 6, 7, 8, 9)}))
 
 
+class ParseInvalidSensorTestCase(TestCase):
+    def test_parse_envt_report_type(self):
+        ret = parse_ursense(
+            'urSense 1.28... commands:\n  e show environment sensor measurements\n  L toggle PPS on LED D5\n'
+        )
+        self.assertEqual(ret, None)
+
+
 class ParseEnvmReportTypeTestCase(TestCase):
     def test_parse_envm_report_type(self):
         ret = parse_ursense(
-            'selE envm 2.800 s usid 0123456789ab skwt 24.6 C brig 1.86% airr 4.69 kOhm humi 35.2% atpr 1002.8 mbar prst 25.3 C'
+            'selF envm 2.800 s usid 0123456789ab skwt 24.6 C brig 1.86% airr 4.69 kOhm humi 35.2% atpr 1002.8 mbar prst 25.3 C\n'
         )
         self.assertTrue(isinstance(ret.system_time, float))
         self.assertEqual(
@@ -181,7 +189,7 @@ class ParseEnvtReportTypeTestCase(TestCase):
         self.assertRaises(
             NotImplementedError,
             parse_ursense,
-            'selE envt 2.800 s usid 0123456789ab skwt 24.6 C brig 1.86% airr 4.69 kOhm humi 35.2% atpr 1002.8 mbar prst 25.3 C',
+            'selE envt 2.800 s usid 0123456789ab skwt 24.6 C brig 1.86% airr 4.69 kOhm humi 35.2% atpr 1002.8 mbar prst 25.3 C\n',
         )
 
 
@@ -190,14 +198,14 @@ class ParseEnvlReportTypeTestCase(TestCase):
         self.assertRaises(
             NotImplementedError,
             parse_ursense,
-            'selE envl 2.800 s usid 0123456789ab skwt 24.6 C brig 1.86% airr 4.69 kOhm humi 35.2% atpr 1002.8 mbar prst 25.3 C',
+            'selE envl 2.800 s usid 0123456789ab skwt 24.6 C brig 1.86% airr 4.69 kOhm humi 35.2% atpr 1002.8 mbar prst 25.3 C\n',
         )
 
 
 class ParseEnvsReportTypeTestCase(TestCase):
     def test_parse_envs_report_type(self):
         ret = parse_ursense(
-            'selE envs 114.205 s usid 0123456789ab skwt 25.2 C brig 1.27% airr 5.47 kOhm humi 35.1% atpr 1003 mbar prst 25.7 C Fri 30.04.2021 20;25;20.123 E1+0000 50.36194N 4.74472W alti 108 m sazi 116.123 WNW salt -1.123 deg'
+            'selE envs 114.205 s usid 0123456789ab skwt 25.2 C brig 1.27% airr 5.47 kOhm humi 35.1% atpr 1003 mbar prst 25.7 C Fri 30.04.2021 20;25;20.123 E1+0000 50.36194N 4.74472W alti 108 m sazi 116.123 WNW salt -1.123 deg\n'
         )
         self.assertTrue(isinstance(ret.system_time, float))
         self.assertEqual(
