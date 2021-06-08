@@ -21,34 +21,38 @@ if test "$#" -ne 3; then
     exit
 fi
 
+if test -f "sta_setup_ids.json"; then
+    echo "configuration already exists."
+    exit
+else
 
 . ../sta.config
 
 rm -f "sta_setup_ids.json"
 
-AUTH_ID=$1
-ACCESS_TOKEN=$2
-STA_URL=$3
-GPS_LON="$FOI_GPS_LON"
-GPS_LAT="$FOI_GPS_LAT"
-PROJECT_ID=$(uuidgen)
-THING_RASPI_ID=$(uuidgen)
-THING_ENV_ID=$(uuidgen)
-FEATURE_ID=$(uuidgen)
-CC0_ID=$(uuidgen)
-CC_BY_ID=$(uuidgen)
-CC_BY_NC_ID=$(uuidgen)
-CC_BY_NC_SA_ID=$(uuidgen)
-CC_BY_SA_ID=$(uuidgen)
-DS_IMAGERY_ID=$(uuidgen)
-DS_TAXON_ID=$(uuidgen)
-DS_TEMPERATURE_ID=$(uuidgen)
-DS_HUMIDITY_ID=$(uuidgen)
-DS_PRESSURE_ID=$(uuidgen)
-DS_BRIGHTNESS_ID=$(uuidgen)
-DATE_TIME_NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    AUTH_ID=$1
+    ACCESS_TOKEN=$2
+    STA_URL=$3
+    GPS_LON="$FOI_GPS_LON"
+    GPS_LAT="$FOI_GPS_LAT"
+    PROJECT_ID=$(uuidgen)
+    THING_RASPI_ID=$(uuidgen)
+    THING_ENV_ID=$(uuidgen)
+    FEATURE_ID=$(uuidgen)
+    CC0_ID=$(uuidgen)
+    CC_BY_ID=$(uuidgen)
+    CC_BY_NC_ID=$(uuidgen)
+    CC_BY_NC_SA_ID=$(uuidgen)
+    CC_BY_SA_ID=$(uuidgen)
+    DS_IMAGERY_ID=$(uuidgen)
+    DS_TAXON_ID=$(uuidgen)
+    DS_TEMPERATURE_ID=$(uuidgen)
+    DS_HUMIDITY_ID=$(uuidgen)
+    DS_PRESSURE_ID=$(uuidgen)
+    DS_BRIGHTNESS_ID=$(uuidgen)
+    DATE_TIME_NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-sta_setup_ids=$(cat -s << EOF
+    sta_setup_ids=$(cat -s << EOF
 {
     "auth_id": "$AUTH_ID",
     "project_id": "$PROJECT_ID",
@@ -74,7 +78,7 @@ sta_setup_ids=$(cat -s << EOF
 EOF
 )
 
-sta_setup_data=$(cat -s << EOF
+    sta_setup_data=$(cat -s << EOF
 {
     "party": {
         "@iot.id": "$AUTH_ID",
@@ -420,106 +424,106 @@ EOF
 )
 
 
-echo -e "\n\n"
-echo "creating Party: $STA_URL/Parties("$AUTH_ID")"
-echo $sta_setup_data | jq '.party'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Parties
+    echo -e "\n\n"
+    echo "creating Party: $STA_URL/Parties("$AUTH_ID")"
+    echo $sta_setup_data | jq '.party'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Parties
 
-echo -e "\n\n"
-echo "creating Project: $STA_URL/Projects("$PROJECT_ID")"
-echo $sta_setup_data |jq '.project'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Projects
+    echo -e "\n\n"
+    echo "creating Project: $STA_URL/Projects("$PROJECT_ID")"
+    echo $sta_setup_data |jq '.project'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Projects
 
-echo -e "\n\n"
-echo "creating Feature: $STA_URL/FeaturesOfInterest("$PROJECT_ID")"
-echo $sta_setup_data |jq '.feature'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/FeaturesOfInterest
-
-
-## Create Things
-
-echo -e "\n\n"
-echo "creating Thing Raspberry: $STA_URL/Things("$THING_RASPI_ID")"
-echo $sta_setup_data |jq '.things.raspberry_pi'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Things
-
-echo -e "\n\n"
-echo "creating Thing Env Board: $STA_URL/Things("$THING_ENV_ID")"
-echo $sta_setup_data |jq '.things.env_board'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Things
+    echo -e "\n\n"
+    echo "creating Feature: $STA_URL/FeaturesOfInterest("$PROJECT_ID")"
+    echo $sta_setup_data |jq '.feature'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/FeaturesOfInterest
 
 
-## Create Licenses
+    ## Create Things
 
-echo -e "\n\n"
-echo "creating License CC0: $STA_URL/Licenses("$CC0_ID")"
-echo $sta_setup_data |jq '.licenses.cc_zero'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Licenses
+    echo -e "\n\n"
+    echo "creating Thing Raspberry: $STA_URL/Things("$THING_RASPI_ID")"
+    echo $sta_setup_data |jq '.things.raspberry_pi'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Things
 
-echo -e "\n\n"
-echo "creating License CC BY: $STA_URL/Licenses("$CC_BY_ID")"
-echo $sta_setup_data |jq '.licenses.cc_by'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Licenses
-
-echo -e "\n\n"
-echo "creating License CC BY-NC: $STA_URL/Licenses("$CC_BY_NC_ID")"
-echo $sta_setup_data |jq '.licenses.cc_by_nc'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Licenses
-
-echo -e "\n\n"
-echo "creating License CC BY-NC-SA: $STA_URL/Licenses("$CC_BY_NC_SA_ID")"
-echo $sta_setup_data |jq '.licenses.cc_by_nc_sa'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Licenses
-
-echo -e "\n\n"
-echo "creating License CC BY-SA: $STA_URL/Licenses("$CC_BY_SA_ID")"
-echo $sta_setup_data |jq '.licenses.cc_by_sa'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Licenses
+    echo -e "\n\n"
+    echo "creating Thing Env Board: $STA_URL/Things("$THING_ENV_ID")"
+    echo $sta_setup_data |jq '.things.env_board'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Things
 
 
-## Create Sensors
+    ## Create Licenses
 
-echo -e "\n\n"
-echo "creating Sensor Camera: $STA_URL/Sensors("$DS_IMAGERY_ID")"
-echo $sta_setup_data |jq '.sensors.imagery'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Sensors
+    echo -e "\n\n"
+    echo "creating License CC0: $STA_URL/Licenses("$CC0_ID")"
+    echo $sta_setup_data |jq '.licenses.cc_zero'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Licenses
 
-echo -e "\n\n"
-echo "creating Sensor Detection: $STA_URL/Sensors(sensor_detection)"
-echo $sta_setup_data |jq '.sensors.detection'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Sensors
+    echo -e "\n\n"
+    echo "creating License CC BY: $STA_URL/Licenses("$CC_BY_ID")"
+    echo $sta_setup_data |jq '.licenses.cc_by'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Licenses
 
-echo -e "\n\n"
-echo "creating Sensor Temperature: $STA_URL/Sensors(sensor_temp)"
-echo $sta_setup_data |jq '.sensors.temperature'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Sensors
+    echo -e "\n\n"
+    echo "creating License CC BY-NC: $STA_URL/Licenses("$CC_BY_NC_ID")"
+    echo $sta_setup_data |jq '.licenses.cc_by_nc'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Licenses
 
-echo -e "\n\n"
-echo "creating Sensor humidity | pressure: $STA_URL/Sensors(sensor_atpr-humi)"
-echo $sta_setup_data |jq '.sensors.humidityAndPressure'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Sensors
+    echo -e "\n\n"
+    echo "creating License CC BY-NC-SA: $STA_URL/Licenses("$CC_BY_NC_SA_ID")"
+    echo $sta_setup_data |jq '.licenses.cc_by_nc_sa'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Licenses
 
-echo -e "\n\n"
-echo "creating Sensor brightness: $STA_URL/Sensors(sensor_brightness)"
-echo $sta_setup_data |jq '.sensors.brightness'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Sensors
-
-
-## Create Datastreams
-
-echo "\n\n"
-echo "creating Datastream Photo: $STA_URL/Datastreams("$DS_IMAGERY_ID")"
-echo $sta_setup_data |jq '.datastreams.imagery'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Datastreams
-
-echo -e "\n\n"
-echo "creating Datastream Taxon: $STA_URL/Datastreams("$DS_TAXON_ID")"
-echo $sta_setup_data |jq '.datastreams.taxon'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Datastreams
-
-echo -e "\n\n"
-echo "creating Datastream Temperature: $STA_URL/Datastreams("$DS_TEMPERATURE_ID")"
-echo $sta_setup_data |jq '.datastreams.temperature'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Datastreams
-
-echo -e "\n\n"
-echo "creating Datastream Rel. Humidity: $STA_URL/Datastreams("$DS_TAXON_ID")"
-echo $sta_setup_data |jq '.datastreams.rh'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Datastreams
-
-echo -e "\n\n"
-echo "creating Datastream Atm. Pressure: $STA_URL/Datastreams("$DS_PRESSURE_ID")"
-echo $sta_setup_data |jq '.datastreams.pressure'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Datastreams
-
-echo -e "\n\n"
-echo "creating Datastream Brightness: $STA_URL/Datastreams("$DS_BRIGHTNESS_ID")"
-brightness=$(echo $sta_setup_data |jq '.datastreams.brightness')
-echo $brightness
-echo $brightness |curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Datastreams
+    echo -e "\n\n"
+    echo "creating License CC BY-SA: $STA_URL/Licenses("$CC_BY_SA_ID")"
+    echo $sta_setup_data |jq '.licenses.cc_by_sa'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Licenses
 
 
-echo -e "\n\n"
-echo "writing sta_setup_ids.json"
-umask 277
-echo $sta_setup_ids > sta_setup_ids.json
+    ## Create Sensors
+
+    echo -e "\n\n"
+    echo "creating Sensor Camera: $STA_URL/Sensors("$DS_IMAGERY_ID")"
+    echo $sta_setup_data |jq '.sensors.imagery'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Sensors
+
+    echo -e "\n\n"
+    echo "creating Sensor Detection: $STA_URL/Sensors(sensor_detection)"
+    echo $sta_setup_data |jq '.sensors.detection'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Sensors
+
+    echo -e "\n\n"
+    echo "creating Sensor Temperature: $STA_URL/Sensors(sensor_temp)"
+    echo $sta_setup_data |jq '.sensors.temperature'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Sensors
+
+    echo -e "\n\n"
+    echo "creating Sensor humidity | pressure: $STA_URL/Sensors(sensor_atpr-humi)"
+    echo $sta_setup_data |jq '.sensors.humidityAndPressure'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Sensors
+
+    echo -e "\n\n"
+    echo "creating Sensor brightness: $STA_URL/Sensors(sensor_brightness)"
+    echo $sta_setup_data |jq '.sensors.brightness'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Sensors
+
+
+    ## Create Datastreams
+
+    echo "\n\n"
+    echo "creating Datastream Photo: $STA_URL/Datastreams("$DS_IMAGERY_ID")"
+    echo $sta_setup_data |jq '.datastreams.imagery'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Datastreams
+
+    echo -e "\n\n"
+    echo "creating Datastream Taxon: $STA_URL/Datastreams("$DS_TAXON_ID")"
+    echo $sta_setup_data |jq '.datastreams.taxon'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Datastreams
+
+    echo -e "\n\n"
+    echo "creating Datastream Temperature: $STA_URL/Datastreams("$DS_TEMPERATURE_ID")"
+    echo $sta_setup_data |jq '.datastreams.temperature'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Datastreams
+
+    echo -e "\n\n"
+    echo "creating Datastream Rel. Humidity: $STA_URL/Datastreams("$DS_TAXON_ID")"
+    echo $sta_setup_data |jq '.datastreams.rh'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Datastreams
+
+    echo -e "\n\n"
+    echo "creating Datastream Atm. Pressure: $STA_URL/Datastreams("$DS_PRESSURE_ID")"
+    echo $sta_setup_data |jq '.datastreams.pressure'|curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Datastreams
+
+    echo -e "\n\n"
+    echo "creating Datastream Brightness: $STA_URL/Datastreams("$DS_BRIGHTNESS_ID")"
+    brightness=$(echo $sta_setup_data |jq '.datastreams.brightness')
+    echo $brightness
+    echo $brightness |curl -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -X POST --data-binary @- $STA_URL/Datastreams
+
+
+    echo -e "\n\n"
+    echo "writing sta_setup_ids.json"
+    umask 277
+    echo $sta_setup_ids > sta_setup_ids.json
