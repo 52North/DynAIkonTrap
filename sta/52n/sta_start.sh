@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+
 if test "$#" -ne 1; then
     echo "USAGE: $0 <sta_url>" 
     exit -1
@@ -100,7 +102,10 @@ sub=$(echo $token_info | jq -r '.sub')
 #run the setup
 ./sta_setup.sh $sub $access_token $sta_url
 
-echo "start perocessing data..."
+trap_home="../../DynAIkonTrap/"
+video_path=$(cat "$trap_home/settings.json" | jq -r '.output.path')
+echo "start preprocessing data from "${video_path:=$trap_home}""
+
 while true; do 
   now=$(date +%s)
    if [ $client_secret_expires_at -lt $((now - 30)) ]; then
@@ -134,16 +139,17 @@ while true; do
   #else
     #echo reuse existing access_token
   fi
-  for f in *.vtt; do 
+  for f in "$video_path/*.vtt"; do 
     if test -f $f; then 
       fname=$(basename $f .vtt)
+      file="$video_path/$fname"
       echo "processing file: $fname with access_token: $access_token for sta_url: $sta_url"
-      ./sta_feeder.sh $fname $access_token $sta_url
+      ./sta_feeder.sh $file $access_token $sta_url
       code=$?;
       if [ $code -ne 0 ]; then
         echo error - skipping file $fname;
       else
-        mv $fname.vtt $fname.vtt_; 
+        mv $file.vtt $file.vtt_; 
       fi
     #else
       #echo "no files to process - waiting 10 seconds..."
