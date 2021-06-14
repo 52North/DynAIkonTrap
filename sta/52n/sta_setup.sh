@@ -24,7 +24,7 @@ fi
 if test -f "sta_setup_ids.json"; then
     echo "configuration already exists."
     exit
-else
+fi
 
 . ../sta.config
 
