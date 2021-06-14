@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 #
 # Copyright 2021 Secure Dimensions GmbH
 # Copyright 2021 52°North Spatial Information Research GmbH
