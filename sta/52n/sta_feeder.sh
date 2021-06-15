@@ -50,10 +50,10 @@ datetime=$date'T'$time
 
 # parse sensorboard data
 data=($(sed '/^$/d' $vtt_file | tail -n 1 | awk '{ print $2; print $5; print $8; print $11}'))
-temperature=${data[0]//?}
-relative_humidity=${data[1]//?}
-brightness=${data[2]//?}
-pressure=${data[3]//?}
+temperature=$(echo ${data[0]} | sed 's/[°Cc]//g')
+relative_humidity=$(echo ${data[1]} | sed 's/[%]//g')
+brightness=$(echo ${data[2]} | sed 's/[%]//g')
+pressure=$(echo ${data[3]} | sed 's/[a-z]//g')
 
 # TODO
 species_guess="Oh look, it's a rabbit!"
