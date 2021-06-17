@@ -24,7 +24,8 @@ fi
 
 sta_url=$1
 
-software_id=$(ifconfig | grep ether | head -1 | xargs | cut -d " " -f 2 | md5 )
+scope="openid profile email offline_access org.52north.demo.cos4cloud:staplus"
+software_id=$(ifconfig | grep ether | head -1 | xargs | cut -d " " -f 2 | md5sum )
 registration=$(cat -s << EOF
 {
     "redirect_uris": [
@@ -42,7 +43,7 @@ registration=$(cat -s << EOF
     ],
     "client_name": "Cos4Cloud Camera Trap App",
     "logo_uri": "https://gitlab.dynaikon.com/uploads/-/system/project/avatar/30/logo_avatar.png",
-    "scope": "openid saml offline_access de.secure-dimensions.demo.cos4cloud:staplus",
+    "scope": "$scope",
     "contacts": [],
     "tos_uri": "https://gitlab.dynaikon.com/dynaikontrap/dynaikontrap",
     "software_id": "$software_id",
@@ -66,7 +67,7 @@ echo $client_id
 echo "-- OR --"
 echo "Open the following URL in a Web Browser and copy the Authorization Code as input"
 echo ""
-echo "https://www.authenix.eu/oauth/authorize?response_type=code&client_id=$client_id&redirect_uri=https%3A%2F%2Fcos4cloud.demo.secure-dimensions.de%2Fcamera-trap-app&scope=openid%20saml%20offline_access%20de.secure-dimensions.demo.cos4cloud:staplus&state=xyz&nonce=123"
+echo "https://www.authenix.eu/oauth/authorize?response_type=code%20id_token&client_id=$client_id&redirect_uri=https%3A%2F%2Fcos4cloud.demo.secure-dimensions.de%2Fcamera-trap-app&scope=$scope&state=xyz&nonce=123"
 echo ""
 read -p "please provide the authorization_code: " authorization_code
 
@@ -78,7 +79,7 @@ token=$(curl --silent -X POST \
    -d "response_type=token refresh_token" \
    -d "code=$authorization_code" \
    -d "redirect_uri=https://cos4cloud.demo.secure-dimensions.de/camera-trap-app" \
-   -d "scope=openid saml offline_access de.secure-dimensions.demo.cos4cloud:staplus" \
+   --data-urlencode "scope=$scope" \
  'https://www.authenix.eu/oauth/token')
 
 access_token=$(echo $token | jq -r '.access_token')
@@ -125,7 +126,7 @@ while true; do
    -d "grant_type=refresh_token" \
    -d "refresh_token=$refresh_token" \
    -d "response_type=token refresh_token" \
-   -d "scope=openid saml offline_access de.secure-dimensions.demo.cos4cloud:staplus" \
+   -d "scope=$scope" \
  'https://www.authenix.eu/oauth/token')
  
   echo "...done"
