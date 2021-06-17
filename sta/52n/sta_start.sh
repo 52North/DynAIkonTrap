@@ -103,8 +103,8 @@ sub=$(echo $token_info | jq -r '.sub')
 #run the setup
 ./sta_setup.sh $sub $access_token $sta_url
 
-trap_home="../../DynAIkonTrap/"
-video_path=$(cat "$trap_home/settings.json" | jq -r '.output.path')
+trap_home="../.."
+video_path=$(cat "$trap_home/DynAIkonTrap/settings.json" | jq -r '.output.path')
 echo "start preprocessing data from "${video_path:=$trap_home}""
 
 while true; do 
@@ -140,8 +140,8 @@ while true; do
   #else
     #echo reuse existing access_token
   fi
-  for f in "$video_path/*.vtt"; do 
-    if test -f $f; then 
+  for f in $video_path/*.vtt; do 
+    #if test -f "$f"; then 
       fname=$(basename $f .vtt)
       file="$video_path/$fname"
       echo "processing file: $fname with access_token: $access_token for sta_url: $sta_url"
@@ -154,7 +154,7 @@ while true; do
       fi
     #else
       #echo "no files to process - waiting 10 seconds..."
-    fi 
+    #fi 
   done; 
   sleep 10; 
 done
