@@ -28,6 +28,7 @@ mp4_file=$1.mp4
 dir_name=$(dirname $vtt_file)
 
 bearer_auth="Bearer $2"
+echo $bearer_auth
 sta_url=$3
 
 # read the ids
